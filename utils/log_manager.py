@@ -4,9 +4,12 @@ from logging.handlers import RotatingFileHandler
 
 class LogManager:
     def __init__(self, log_dir="logs"):
-        self.log_dir = log_dir
-        if not os.path.exists(log_dir):
-            os.makedirs(log_dir)
+        import os
+        # 确保日志目录在当前工作目录
+        self.log_dir = os.path.join(os.getcwd(), log_dir)
+        if not os.path.exists(self.log_dir):
+            os.makedirs(self.log_dir)
+            print(f"已创建日志目录: {self.log_dir}")
         
         # 配置根日志
         logging.basicConfig(

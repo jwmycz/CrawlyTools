@@ -1,0 +1,1 @@
+ pyinstaller --clean --onefile  --noconsole --name 爬虫管理系统 main.py

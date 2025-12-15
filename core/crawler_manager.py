@@ -121,9 +121,22 @@ class CrawlerManager:
     
     def load_crawlers(self):
         """加载crawlers目录下所有爬虫模块、自定义脚本和导入的项目"""
-        # 获取项目根目录
-        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        crawlers_dir = os.path.join(project_root, "crawlers")
+        # 获取当前工作目录（确保打包后能找到正确的crawlers目录）
+        import os
+        import sys
+        
+        # 优先使用当前工作目录
+        crawlers_dir = os.path.join(os.getcwd(), "crawlers")
+        
+        # 如果当前目录没有crawlers目录，尝试使用可执行文件所在目录
+        if not os.path.exists(crawlers_dir):
+            exe_dir = os.path.dirname(os.path.abspath(sys.executable))
+            crawlers_dir = os.path.join(exe_dir, "crawlers")
+        
+        # 确保crawlers目录存在
+        if not os.path.exists(crawlers_dir):
+            os.makedirs(crawlers_dir)
+            print(f"已创建crawlers目录: {crawlers_dir}")
         
         # 确保crawlers目录在sys.path中
         if crawlers_dir not in sys.path:

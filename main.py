@@ -11,7 +11,7 @@ from utils.scheduler_manager import SchedulerManager
 
 class CrawlerGUI(wx.Frame):
     def __init__(self):
-        super().__init__(None, title="爬虫管理系统", size=(1000, 700))
+        super().__init__(None, title="爬虫管理系统", size=(1200, 800))
         
         # 先初始化UI，显示界面
         self.init_ui()
@@ -32,10 +32,14 @@ class CrawlerGUI(wx.Frame):
         """后台初始化操作"""
         print("开始后台初始化...")
         try:
-            self.crawler_manager = CrawlerManager()
-            print("CrawlerManager初始化成功")
+            # 先初始化系统资源监控（确保优先可用）
             self.system_monitor = SystemMonitor()  # 初始化系统资源监控
             print("SystemMonitor初始化成功")
+            
+            # 然后初始化CrawlerManager
+            self.crawler_manager = CrawlerManager()
+            print("CrawlerManager初始化成功")
+            
             # 初始化调度器
             print("开始初始化调度器...")
             self.scheduler_manager = SchedulerManager(self.crawler_manager)
@@ -90,7 +94,7 @@ class CrawlerGUI(wx.Frame):
         self.task_list.InsertColumn(0, "任务名", width=150)
         self.task_list.InsertColumn(1, "状态", width=100)
         self.task_list.InsertColumn(2, "上次运行时间", width=150)
-        self.task_list.InsertColumn(3, "参数", width=200)
+        self.task_list.InsertColumn(3, "参数", width=300)
         
         left_sizer.Add(self.task_list, 1, wx.EXPAND | wx.ALL, 5)
         left_panel.SetSizer(left_sizer)
@@ -124,7 +128,7 @@ class CrawlerGUI(wx.Frame):
         right_panel.SetupScrolling()
         
         # 设置分割窗口比例
-        splitter.SplitVertically(left_panel, right_panel, 400)
+        splitter.SplitVertically(left_panel, right_panel, 500)
         splitter.SetMinimumPaneSize(300)
         
         main_sizer.Add(splitter, 1, wx.EXPAND | wx.ALL, 5)
@@ -156,27 +160,27 @@ class CrawlerGUI(wx.Frame):
     
     def update_status(self, event):
         """更新任务状态和系统资源信息"""
-        if not self.crawler_manager or not self.system_monitor:
-            return
+        # 更新系统资源监控信息（独立于crawler_manager状态）
+        if self.system_monitor:
+            system_info = self.system_monitor.get_system_info_string()
+            self.system_info_text.SetLabel(f"系统资源监控: {system_info}")
+        
+        # 更新任务状态（需要crawler_manager）
+        if self.crawler_manager:
+            # 更新任务列表
+            crawlers = self.crawler_manager.get_crawlers()
+            for i in range(self.task_list.GetItemCount()):
+                task_name = self.task_list.GetItem(i, 0).GetText()
+                crawler = crawlers.get(task_name)
+                if crawler:
+                    self.task_list.SetItem(i, 1, crawler.status)
+                    self.task_list.SetItem(i, 2, crawler.last_run_time or "-")
             
-        # 更新任务状态
-        crawlers = self.crawler_manager.get_crawlers()
-        for i in range(self.task_list.GetItemCount()):
-            task_name = self.task_list.GetItem(i, 0).GetText()
-            crawler = crawlers.get(task_name)
-            if crawler:
-                self.task_list.SetItem(i, 1, crawler.status)
-                self.task_list.SetItem(i, 2, crawler.last_run_time or "-")
-        
-        # 更新当前选中任务的日志和错误信息
-        selected = self.task_list.GetFirstSelected()
-        if selected != -1:
-            task_name = self.task_list.GetItem(selected, 0).GetText()
-            self.update_logs(task_name)
-        
-        # 更新系统资源监控信息
-        system_info = self.system_monitor.get_system_info_string()
-        self.system_info_text.SetLabel(f"系统资源监控: {system_info}")
+            # 更新当前选中任务的日志和错误信息
+            selected = self.task_list.GetFirstSelected()
+            if selected != -1:
+                task_name = self.task_list.GetItem(selected, 0).GetText()
+                self.update_logs(task_name)
     
     def on_run(self, event):
         """运行选中任务"""

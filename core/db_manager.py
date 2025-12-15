@@ -4,7 +4,9 @@ import time
 
 class DBManager:
     def __init__(self, db_file="crawler.db"):
-        self.db_file = db_file
+        import os
+        # 确保数据库文件在当前工作目录
+        self.db_file = os.path.join(os.getcwd(), db_file)
         self.init_db()
     
     def init_db(self):
