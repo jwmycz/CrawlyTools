@@ -244,7 +244,7 @@ class CrawlerGUI(wx.Frame):
     def on_import(self, event):
         """导入爬虫模块或项目"""
         # 创建导入类型选择对话框
-        dialog = wx.Dialog(self, title="选择导入类型", size=(300, 200))
+        dialog = wx.Dialog(self, title="选择导入类型", size=(400, 250))
         panel = wx.Panel(dialog)
         sizer = wx.BoxSizer(wx.VERTICAL)
         
@@ -333,7 +333,7 @@ class CrawlerGUI(wx.Frame):
                 project_name = os.path.splitext(file_name)[0]
                 
                 # 目标目录：crawlers/项目名
-                dest_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "crawlers", project_name)
+                dest_dir = os.path.join(os.getcwd(), "crawlers", project_name)
                 
                 # 检查目标目录是否存在
                 if os.path.exists(dest_dir):
@@ -408,7 +408,7 @@ class CrawlerGUI(wx.Frame):
                     
                     # 目标目录：crawlers/项目名
                     project_name = os.path.basename(project_dir)
-                    dest_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "crawlers", project_name)
+                    dest_dir = os.path.join(os.getcwd(), "crawlers", project_name)
                     
                     # 检查目标目录是否存在
                     if os.path.exists(dest_dir):
@@ -515,7 +515,7 @@ class CrawlerGUI(wx.Frame):
                 
                 # 目标目录：crawlers/项目名
                 project_name = os.path.basename(project_dir)
-                dest_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "crawlers", project_name)
+                dest_dir = os.path.join(os.getcwd(), "crawlers", project_name)
                 
                 # 检查目标目录是否存在
                 if os.path.exists(dest_dir):
